@@ -3,17 +3,20 @@
 import scipy
 import numpy as np
 import random
+import os
 from PIL import Image
 from copy import deepcopy as copy
 from dct import *
 
-im = Image.open("imageRGB.jpg")
+im = Image.open("image.jpg")
 img_src = scipy.misc.fromimage(im,flatten=0)
 
-if im.mode != 'L':
+if im.mode == 'RGB':
 	img_component = img_src[...,1]
-else:
+elif im.mode == 'L':
 	img_component = img_src
+else:
+	print "Error"
 if(img_component.shape[0] < 256 or img_component.shape[1] < 256):
 	print "Error"
 else:
@@ -22,7 +25,7 @@ else:
 #Set a seed for random number generator
 random.seed("agRJJHoiefxn8328D24kg")
 
-message = "vivekzhere@gmail.com#password"
+message = "vivekzhere@gmail.com#missippi"
 asciilist = [ord(c) for c in message]
 binlist = ['{0:08b}'.format(i) for i in asciilist]
 binstr = "".join(binlist)
@@ -110,35 +113,32 @@ for I in range(Mb):
 				sgn = '-'
 			
 			if(zigzag[n] > 0):                                                #Checking for threshold
-				if(randBlockQ[i][j] > 0.5 and randBlockQ[i][j]<0.7):
+				if( randBlockQ[i][j] > 0.5 and randBlockQ[i][j] < 0.7):
 					randBlockQ[i][j] = 0.7
 				if(randBlockQ[i][j] < -0.5 and randBlockQ[i][j] > -0.7):
 					randBlockQ[i][j] = -0.7
 				
 				if(bitCount < accbitstream.__len__()):           
 					if (accbitstream[bitCount] == '1'):                               #If bit to be encoded is 1
-						if (zigzag[n] % 2 == 0):                                    #Converting to odd if it is an even reconstruction point
-							#print "Old Value = ",randBlockQ[i][j]
+						if (zigzag[n] % 2 == 0):                                    #Converting to odd if it is an even reconstruction point			
 							if sgn == '+':											#Incrementing to next step size to get odd							
-								randBlockQ[i][j] = (randBlockDCT[i][j] + newQM[i][j]) / newQM[i][j]								
+								randBlockQ[i][j] = (randBlockDCT[i][j] + newQM[i][j]) / newQM[i][j]							
 							else:
 								randBlockQ[i][j] = (randBlockDCT[i][j] - newQM[i][j]) / newQM[i][j]
-							#print "New Value = ",randBlockQ[i][j]   
+							   
 														
 					elif (accbitstream[bitCount] == '0'):								#If bit to be encoded is 0
 						if (zigzag[n] % 2 != 0):									#Converting to even if it is an odd reconstruction point
-							#print "Old Value = ",randBlockQ[i][j]
 							if sgn == '+':											#Incrementing to next step size to get even
 								randBlockQ[i][j] = (randBlockDCT[i][j] + newQM[i][j]) / newQM[i][j]
 							else:
-								randBlockQ[i][j] = (randBlockDCT[i][j] - newQM[i][j]) / newQM[i][j]
-							#print "New Value = ",randBlockQ[i][j]   
+								randBlockQ[i][j] = (randBlockDCT[i][j] - newQM[i][j]) / newQM[i][j]   
 			
 				bitCount = bitCount + 1
 			elif (zigzag[n] == 0):
 				randBlockQ[i][j]=zigzag[n]
 				
-				
+					
 		irandBlockDCT = np.multiply(randBlockQ,newQM)
 		irandBlock = idct2(irandBlockDCT)
 		irandBlock = np.add(irandBlock,128)
@@ -153,5 +153,7 @@ else:
 	img_src = img_component
 
 newim = scipy.misc.toimage(img_src,255,0,mode=im.mode)
-newim.save("newimage.jpg",'JPEG', quality=100)
-		
+img_src2=scipy.misc.fromimage(newim,flatten=0)
+
+newim.save("newimage.jpg",'PNG', quality=100)
+os.system("convert newimage.jpg -quality 100 newimage.jpg")	

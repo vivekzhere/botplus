@@ -77,7 +77,6 @@ for I in range(Mb):
 		randBlock = np.add(randBlock,-128)
 		randBlockDCT = dct2(randBlock)
 		randBlockQ = np.divide(randBlockDCT,newQM)
-		
 		##Decoding
 		rowstep = -1		
 		colstep = 1
