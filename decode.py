@@ -98,9 +98,11 @@ def decode(filename,l):
 				absval = abs(round(randBlockQ[i][j]))
 				if (absval > 0):
 					if (absval%2 == 0):
+						#print randBlockQ[i][j] , 0
 						bitstream.append(0)
 						bitCount = bitCount + 1
 					else:
+						#print randBlockQ[i][j] , 1
 						bitstream.append(1)
 						bitCount = bitCount + 1
 					
@@ -125,4 +127,4 @@ def decode(filename,l):
 		n = int(decodestream, 2)
 		decodestr=unhexlify('%x' % n)
 		print decodestr
-		return img
+		return bitstream

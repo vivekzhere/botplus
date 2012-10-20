@@ -134,15 +134,15 @@ def encode(filename,message):
 								else:
 									randBlockQ[i][j] = (randBlockDCT[i][j] - newQM[i][j]) / newQM[i][j]   
 			
+						#print randBlockQ[i][j] , accbitstream[bitCount]
 					bitCount = bitCount + 1
 				elif (zigzag[n] == 0):
 					randBlockQ[i][j]=zigzag[n]
 				
-					
 			irandBlockDCT = np.multiply(randBlockQ,newQM)
 			irandBlock = idct2(irandBlockDCT)
 			irandBlock = np.add(irandBlock,128)
-			newimg[((I)*B+Sx):((I)*B+Sx+8), ((J)*B+Sy):((J)*B+Sy+8)] = np.uint8(irandBlock)
+			newimg[((I)*B+Sx):((I)*B+Sx+8), ((J)*B+Sy):((J)*B+Sy+8)] = np.uint8(np.round(irandBlock))
 
 
 
@@ -157,4 +157,4 @@ def encode(filename,message):
 	newim.save(destfile,'PNG', quality=100)
 	shellcommand = "convert '" + destfile + "' -quality 100 '" + destfile + "'"
 	os.system(shellcommand)
-	return newimg
+	return accbitstream
