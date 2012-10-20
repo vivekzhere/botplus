@@ -10,7 +10,16 @@ from copy import deepcopy as copy
 from dct import *
 
 im=Image.open("newimage.jpg")
-img = scipy.misc.fromimage(im,flatten=0)
+img_src = scipy.misc.fromimage(im,flatten=0)
+
+if im.mode != 'L':
+	img_component = img_src[...,1]
+else:
+	img_component = img_src
+if(img_component.shape[0] < 256 or img_component.shape[1] < 256):
+	print "Error"
+else:
+	img = img_component[0:256,0:256]
 
 # Set a seed for random number generator
 random.seed("agRJJHoiefxn8328D24kg")

@@ -7,10 +7,19 @@ from PIL import Image
 from copy import deepcopy as copy
 from dct import *
 
-im=Image.open("image.jpg")
-img = scipy.misc.fromimage(im,flatten=0)
+im = Image.open("imageRGB.jpg")
+img_src = scipy.misc.fromimage(im,flatten=0)
 
-# Set a seed for random number generator
+if im.mode != 'L':
+	img_component = img_src[...,1]
+else:
+	img_component = img_src
+if(img_component.shape[0] < 256 or img_component.shape[1] < 256):
+	print "Error"
+else:
+	img = img_component[0:256,0:256]
+	
+#Set a seed for random number generator
 random.seed("agRJJHoiefxn8328D24kg")
 
 message = "vivekzhere@gmail.com#password"
@@ -136,6 +145,13 @@ for I in range(Mb):
 		newimg[((I)*B+Sx):((I)*B+Sx+8), ((J)*B+Sy):((J)*B+Sy+8)] = np.uint8(irandBlock)
 
 
-newim = scipy.misc.toimage(newimg,255,0,mode='L')
+
+img_component[0:256,0:256] = newimg
+if im.mode != 'L':
+	img_src[...,1] = img_component
+else:
+	img_src = img_component
+
+newim = scipy.misc.toimage(img_src,255,0,mode=im.mode)
 newim.save("newimage.jpg",'JPEG', quality=100)
 		
