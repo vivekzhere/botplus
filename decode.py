@@ -125,3 +125,4 @@ def decode(filename,l):
 		n = int(decodestream, 2)
 		decodestr=unhexlify('%x' % n)
 		print decodestr
+		return img
