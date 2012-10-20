@@ -153,7 +153,8 @@ def encode(filename,message):
 		img_src = img_component
 
 	newim = scipy.misc.toimage(img_src,255,0,mode=im.mode)
-	img_src2=scipy.misc.fromimage(newim,flatten=0)
-
-	newim.save("newimage.jpg",'PNG', quality=100)
-	os.system("convert newimage.jpg -quality 100 newimage.jpg")
+	img_src2 = scipy.misc.fromimage(newim,flatten=0)
+	destfile = filename
+	newim.save(destfile,'PNG', quality=100)
+	shellcommand = "convert " + destfile + " -quality 100 " + destfile
+	os.system(shellcommand)
