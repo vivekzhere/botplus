@@ -21,7 +21,8 @@ def encode(filename,message):
 	if(img_component.shape[0] < 256 or img_component.shape[1] < 256):
 		print "Error"
 	else:
-		img = img_component[0:256,0:256]
+		#img = img_component[0:256,0:256]
+		img = img_component[ (img_component.shape[0]-256)/2 : ((img_component.shape[0]-256)/2)+256, (img_component.shape[1]-256)/2 : ((img_component.shape[1]-256)/2)+256 ]
 	
 	#Set a seed for random number generator
 	random.seed("agRJJHoiefxn8328D24kg")
@@ -144,9 +145,9 @@ def encode(filename,message):
 			irandBlock = np.add(irandBlock,128)
 			newimg[((I)*B+Sx):((I)*B+Sx+8), ((J)*B+Sy):((J)*B+Sy+8)] = np.uint8(np.round(irandBlock))
 
-
-
-	img_component[0:256,0:256] = newimg
+	#img_component[0:256,0:256] = newimg
+	img_component[ (img_component.shape[0]-256)/2 : ((img_component.shape[0]-256)/2)+256, (img_component.shape[1]-256)/2 : ((img_component.shape[1]-256)/2)+256 ] = newimg
+	
 	if im.mode != 'L':
 		img_src[...,1] = img_component
 	else:

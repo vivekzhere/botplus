@@ -18,9 +18,10 @@ def decode(filename,l):
 	else:
 		img_component = img_src
 	if(img_component.shape[0] < 256 or img_component.shape[1] < 256):
-		print "Error"
+		return -1
 	else:
-		img = img_component[0:256,0:256]
+		#img = img_component[0:256,0:256]
+		img = img_component[ (img_component.shape[0]-256)/2 : ((img_component.shape[0]-256)/2)+256, (img_component.shape[1]-256)/2 : ((img_component.shape[1]-256)/2)+256 ]
 
 	# Set a seed for random number generator
 	random.seed("agRJJHoiefxn8328D24kg")
@@ -120,11 +121,13 @@ def decode(filename,l):
 			elif(drepbitstream[i*q:(i+1)*q].count(0) >= 3):
 				obitstream.append('0')
 			else:
-				print "Error\n"
+				return -2
 
 		decodestream="".join(obitstream)
 		decodestream='0b'+decodestream
 		n = int(decodestream, 2)
 		decodestr=unhexlify('%x' % n)
-		print decodestr
-		return bitstream
+		return decodestr
+		#return bitstream
+	else:
+		return -3
