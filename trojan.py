@@ -174,7 +174,7 @@ def encode_run (decode_msglist,update_dt):
 			i = (i+1)%num_of_msgs;
 			encode(infile,msglist[i]);
 			num_of_files = num_of_files + 1
-		f = open('bootup.cfg', 'w+')
+		f = open('/tmp/bootup.cfg', 'w+')
 		num_encoded = min(num_of_msgs, num_of_files)
 		f.write(str(num_encoded)+"\n")
 		f.write(update_dt.strftime("%Y-%m-%d %H:%M:%S"))
